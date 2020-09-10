@@ -4,58 +4,68 @@ milk = 540
 coffee_beans = 120
 cups = 9
 
-#def check(cup_water, cup_milk, cup_beans):
-  #global water, milk, coffee_beans, cups
-  #cups_of_water = water // 200
-  #cups_of_milk = milk // 50
-  #cups_of_coffee = coffee // 15
-  #min_cups = min(min(cups_of_water,cups_of_milk),cups_of_coffee)
-  #if count_of_cups == min_cups:
-  #  print("Yes, I can make that amount of coffee")
-  #elif count_of_cups < min_cups:
-  #  print("Yes, I can make that amount of coffee (and even", min_cups - count_of_cups, "more than that)")
-  #elif count_of_cups > min_cups:
-  #  print("No, I can make only", min_cups, "cups of coffee")
-
 def machine_state():
   print('The coffee machine has:')
   print(water, 'of water')
   print(milk, 'of milk')
   print(coffee_beans, 'of coffee beans')
   print(cups, 'of disposable cups')
-  print(money, 'of money')
+  print('${}'.format(money), 'of money')
+
+def check(name, resource, cup_need):
+  if cup_need > resource:
+    return name + ', '
+  else:
+    return '+'
+
+def make_coffee(water_cup, milk_cup, beans_cup, money_cup):
+  global water, milk, coffee_beans, cups, money
+  water -= water_cup
+  milk -= milk_cup
+  coffee_beans -= beans_cup
+  cups -= 1
+  money += money_cup
+
 
 def espresso():
-  global water, coffee_beans, money
-  water -= 250
-  coffee_beans -= 16
-  money += 4
+  global water, coffee_beans, cups, money
+  enough = check('water', water, 250) + check('coffee beans', coffee_beans, 16) + check('disposable cups', cups, 1)
+  if enough == '+++':
+    make_coffee(250, 0, 16, 4)
+    print('I have enough resources, making you a coffee!')
+  else:
+    print('Sorry, not enough {}!'.format(enough.strip(' ,+')))
+
 
 def latte():
-  global water, coffee_beans, money, milk
-  water -= 350
-  milk -= 75
-  coffee_beans -= 20
-  money += 7
+  global water, milk, coffee_beans, cups, money
+  enough = check('water', water, 350) + check('milk', milk, 75) + check('coffee beans', coffee_beans, 20) + check('disposable cups', cups, 1)
+  if enough == '++++':
+    make_coffee(350, 75, 20, 7)
+    print('I have enough resources, making you a coffee!')
+  else:
+    print('Sorry, not enough {}!'.format(enough.strip(' ,+')))
 
 def cappuccino():
-  global water, coffee_beans, money, milk
-  water -= 200
-  milk -= 100
-  coffee_beans -= 12
-  money += 6
+  global water, milk, coffee_beans, cups, money
+  enough = check('water', water, 200) + check('milk', milk, 100) + check('coffee beans', coffee_beans, 12) + check('disposable cups', cups, 1)
+  if enough == '++++':
+    make_coffee(200, 100, 12, 6)
+    print('I have enough resources, making you a coffee!')
+  else:
+    print('Sorry, not enough {}!'.format(enough.strip(' ,+')))
 
 def buy_coffee():
-  global cups
-  print('What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino:')
+  print('What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:')
   clients_coffee = input()
-  cups -= 1
   if clients_coffee == '1':
     espresso()
   elif clients_coffee == '2':
     latte()
   elif clients_coffee == '3':
     cappuccino()
+  elif clients_coffee == 'back':
+    input_inf()
 
 def fill_machine():
   global water, milk, coffee_beans, cups
@@ -80,14 +90,18 @@ def all_action(action):
     fill_machine()
   elif action == 'take':
     take_money()
+  elif action == 'remaining':
+    machine_state()
+  elif action == 'exit':
+    return 0
+  print()
 
 def input_inf():
-  machine_state()
-  print('\nWrite action (buy, fill, take):')
+  print('Write action (buy, fill, take, remaining, exit):')
   action = input()
-  all_action(action)
-  print('')
-  machine_state()
+  print()
+  return all_action(action)
 
-input_inf()
+while input_inf() != 0:
+  continue
 
